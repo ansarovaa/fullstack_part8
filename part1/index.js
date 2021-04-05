@@ -80,7 +80,7 @@ id: ID!
 bookCount: Int!
 }
 type Book {
-  title: String!
+  title: String
   published: Int!
   author: String!
   id: ID!
@@ -90,6 +90,7 @@ type Book {
     bookCount: Int!
     authorCount: Int!
     allBooks: [Book!]!
+    findBooksByAuthor(author: String): [Book!]!
     allAuthors: [Author!]!
   }
 `
@@ -98,7 +99,8 @@ const resolvers = {
     Query: {
         bookCount: () => books.length,
         authorCount: () => authors.length,
-        allBooks: () => books, 
+        allBooks: () => books,
+        findBooksByAuthor: (root, args) => books.filter(p => p.author === args.author), 
         allAuthors: () => {
           const bookPerAuthors = authors.map((author) => 
           books.filter(book => book.author === author.name))
