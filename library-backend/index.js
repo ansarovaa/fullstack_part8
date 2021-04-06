@@ -119,10 +119,12 @@ const resolvers = {
             }
             return books.filter(p => (!args.author || p.author === args.author) && (!args.genre || p.genres.includes(args.genre)))
         },
-        allAuthors: () => {
-            const bookPerAuthors = authors.map((author) => books.filter(book => book.author === author.name))
-            return bookPerAuthors.map((i) => ({bookCount: i.length, name: i[0].author}))
-        }
+        allAuthors: () => authors.map(author => {
+            author.bookCount = books
+                .filter(book => book.author === author.name)
+                .length
+            return author
+        })
     },
     Mutation: {
         addBook: (root, args) => {
@@ -151,11 +153,10 @@ const resolvers = {
     }
 }
 
-
 const server = new ApolloServer({typeDefs, resolvers})
 
 server
-.listen()
-.then(({url}) => {
-console.log(`Server ready at ${url}`)
-})
+    .listen()
+    .then(({url}) => {
+        console.log(`Server ready at ${url}`)
+    })
