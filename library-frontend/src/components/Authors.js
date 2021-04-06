@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
-import {useQuery, useMutation} from "@apollo/client";
-import {ALL_AUTHORS, EDIT_AUTHOR} from "../queries";
+import Select from 'react-select'
+import {useQuery, useMutation} from "@apollo/client"
+import {ALL_AUTHORS, EDIT_AUTHOR} from "../queries"
 
 const Authors = ({show}) => {
     const [name,
@@ -8,7 +9,7 @@ const Authors = ({show}) => {
     let [born,
         setBorn] = useState('')
 
-    const result = useQuery(ALL_AUTHORS)
+    const {loading, data} = useQuery(ALL_AUTHORS)
     const [changeYear] = useMutation(EDIT_AUTHOR, {
         refetchQueries: [
             {
@@ -17,11 +18,20 @@ const Authors = ({show}) => {
         ]
     })
 
+    const options = data?.allAuthors?.map((option) => {
+                return {
+                    value: option
+                        .name
+                        .toLowerCase(),
+                    label: option.name
+                };
+            });
+
     if (!show) {
         return null
     }
 
-    if (result.loading) {
+    if (loading) {
         return <div>loading...</div>
     }
 
@@ -53,8 +63,7 @@ const Authors = ({show}) => {
                             books
                         </th>
                     </tr>
-                    {result
-                        .data
+                    {data
                         .allAuthors
                         .map(a => <tr key={a.name}>
                             <td>{a.name}</td>
@@ -68,7 +77,10 @@ const Authors = ({show}) => {
                 <form onSubmit={submit}>
                     <div>
                         name
-                        <input value={name} onChange={({target}) => setName(target.value)}/>
+                        <Select
+                            placeholder="Select author..."
+                            options = {options}
+                            onChange={({label}) => setName(label)}/>
                     </div>
                     <div>
                         born
