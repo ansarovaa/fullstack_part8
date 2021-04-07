@@ -3,20 +3,23 @@ const {v1: uuid} = require('uuid')
 const mongoose = require('mongoose')
 const Author = require('./models/author')
 const Book = require('./models/book')
+const config = require('./utils/config')
 
-const MONGODB_URI = 'mongodb+srv://fullstack:fullstack@cluster0.slx8m.mongodb.net/library?retryWrites=true&w=majority'
+console.log('Connecting to', config.MONGODB_URI)
 
-console.log('connecting to', MONGODB_URI)
+mongoose
+    .connect(config.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+    .then(() => {
+        console.log('Connected to MongoDB')
+    })
+    .catch((error) => {
+        console.log('Error connecting to MongoDB:', error.message)
+    })
 
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
-  .then(() => {
-    console.log('connected to MongoDB')
-  })
-  .catch((error) => {
-    console.log('error connection to MongoDB:', error.message)
-  })
-
-let authors = [
+    let authors = [
     {
         name: 'Robert Martin',
         id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
@@ -99,7 +102,7 @@ bookCount: Int!
 type Book {
   title: String
   published: Int!
-  author: String!
+  author: Author!
   id: ID!
   genres: [String]!
 }
@@ -126,12 +129,17 @@ type Book {
 
 const resolvers = {
     Query: {
-        bookCount: () => Book.collection.countDocuments(),
-        authorCount: () => Author.collection.countDocuments(),
+        bookCount: () => Book
+            .collection
+            .countDocuments(),
+        authorCount: () => Author
+            .collection
+            .countDocuments(),
         allBooks: (root, args) => {
             if (!args.author && !args.genre) {
-                return books
+                return Book.find({})
             }
+
             return books.filter(p => (!args.author || p.author === args.author) && (!args.genre || p.genres.includes(args.genre)))
         },
         allAuthors: () => authors.map(author => {
