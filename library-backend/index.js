@@ -142,20 +142,22 @@ const resolvers = {
 
             return books.filter(p => (!args.author || p.author === args.author) && (!args.genre || p.genres.includes(args.genre)))
         },
-        allAuthors: () => authors.map(author => {
-            author.bookCount = books
-                .filter(book => book.author === author.name)
-                .length
-            return author
-        })
+        allAuthors: () => Author.find()
+
     },
     Mutation: {
-        addBook: (root, args) => {
-            const book = {
-                ...args,
-                id: uuid()
+        addBook: async(root, args) => {
+            let author = await Author.findOne({name: args.author})
+            if (!author) {
+                author = new Author({name: args.author, bookCount: 1})
+                await author.save()
+            } else {
+                author.bookCount += 1
+                await author.save()
             }
-            books = books.concat(book)
+
+            let book = new Book({title: args.title, published: args.published, genres: args.genres, author: author})
+                await book.save()
             return book
         },
         editAuthor: (root, args) => {
