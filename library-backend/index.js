@@ -149,7 +149,7 @@ const resolvers = {
         addBook: async(root, args) => {
             let author = await Author.findOne({name: args.author})
             if (!author) {
-                author = new Author({name: args.author, bookCount: 1})
+                author = new Author({name: args.author, bookCount: 1, born: 0})
                 await author.save()
             } else {
                 author.bookCount += 1
@@ -157,23 +157,18 @@ const resolvers = {
             }
 
             let book = new Book({title: args.title, published: args.published, genres: args.genres, author: author})
-                await book.save()
+            await book.save()
             return book
         },
-        editAuthor: (root, args) => {
-            const author = authors.find(p => p.name === args.name)
+        editAuthor: async(root, args) => {
+            let author = await Author.findOne({name: args.name})
             if (!author) {
                 return null
             }
+            author.born = args.born
+            await author.save()
+            return author
 
-            const updatedAuthor = {
-                ...author,
-                born: args.born
-            }
-            authors = authors.map(p => p.name === args.name
-                ? updatedAuthor
-                : p)
-            return updatedAuthor
         }
     }
 }
