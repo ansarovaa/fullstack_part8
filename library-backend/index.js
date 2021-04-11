@@ -23,7 +23,7 @@ mongoose
 
     const typeDefs = gql `
 type Author {
-name: String!
+name: String
 id: ID!
 born: Int
 bookCount: Int!
@@ -31,7 +31,7 @@ bookCount: Int!
 type Book {
   title: String
   published: Int!
-  author: Author!
+  author: Author
   id: ID!
   genres: [String]!
 }
@@ -82,12 +82,15 @@ const resolvers = {
         authorCount: () => Author
             .collection
             .countDocuments(),
-        allBooks: (root, args) => {
-            if (!args.author && !args.genre) {
-                return Book.find({})
+        allBooks: async(root, args) => {
+            let filter = {}
+            if (args.genre) {
+                filter['genres'] = {
+                    $in: [args.genre]
+                }
             }
-
-            return books.filter(p => (!args.author || p.author === args.author) && (!args.genre || p.genres.includes(args.genre)))
+            const books = await Book.find(filter)
+            return books
         },
         allAuthors: () => Author.find(),
         me: (root, args, context) => {
