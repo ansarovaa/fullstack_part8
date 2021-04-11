@@ -17,6 +17,7 @@ const Authors = ({show}) => {
             }
         ]
     })
+    
 
     const options = data?.allAuthors?.map((option) => {
                 return {
