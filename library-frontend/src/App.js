@@ -63,13 +63,20 @@ const App = () => {
                     ? <button onClick={() => setPage('add')}>Add Book</button>
                     : null}
                 {token
+                    ? <button onClick={() => setPage('recommend')}>Recommend</button>
+                    : null}
+                {token
                     ? <button onClick={() => logout()}>Logout</button>
                     : <button onClick={() => setPage('login')}>Login</button>}
             </div>
 
             <Authors show={page === 'authors'}/>
 
-            <Books show={page === 'books'}/>
+            <Books
+                show={page === 'recommend'}
+                genreToShow={user
+                ? user.favoriteGenre
+                : null}/>
 
             <NewBook show={page === 'add'}/>
             <Login show={page === 'login'} setError={notify} setNewToken={setNewToken}/>

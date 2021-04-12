@@ -49,7 +49,10 @@ const Books = ({show, genreToShow}) => {
 
     return (
         <div>
-            <h2>books</h2>
+            {genreToShow
+                ? <h2>Recommendations</h2>
+                : <h2>Books</h2>
+}
             {genreToShow
                 ? <h3>Books in your favorite genre '{genreToShow}'</h3>
                 : (genre
