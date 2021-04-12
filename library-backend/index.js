@@ -22,8 +22,9 @@ mongoose
     .catch((error) => {
         console.log('Error connecting to MongoDB:', error.message)
     })
+    mongoose.set('debug', true)
 
-    const typeDefs = gql `
+const typeDefs = gql `
 type Author {
 name: String
 id: ID!
