@@ -87,7 +87,7 @@ const resolvers = {
             if (args.genre) {
                 filter['genres'] = {
                     $in: [args.genre]
-                }
+            }
             }
             const books = await Book.find(filter)
             return books
